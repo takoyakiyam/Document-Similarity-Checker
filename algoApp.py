@@ -2,6 +2,13 @@ import tkinter as tk
 from tkinter import filedialog
 import PyPDF2
 import docx
+import markdown
+import striprtf
+from bs4 import BeautifulSoup
+import csv
+import json
+import xml.etree.ElementTree as ET
+import yaml
 
 # Define the Jaccard Similarity function
 def jaccard_similarity(text1, text2, shingle_size=3):
@@ -11,11 +18,23 @@ def jaccard_similarity(text1, text2, shingle_size=3):
     union = shingles1.union(shingles2)
     return len(intersection) / len(union) if len(union) > 0 else 0
 
-# Define the function to open and read a file
+# Define the function to extract text from various file types
 def open_file(text_entry):
     filename = filedialog.askopenfilename(
         title="Select a File",
-        filetypes=[("Text files", "*.txt"), ("docx files", "*.docx"), ("PDF files", "*.pdf")]
+        filetypes=[
+            ("Text files", "*.txt"),
+            ("Microsoft Word", "*.docx"),
+            ("PDF files", "*.pdf"),
+            ("Markdown files", "*.md"),
+            ("Rich Text Format", "*.rtf"),
+            ("HTML files", "*.html;*.htm"),
+            ("Comma-Separated Values", "*.csv"),
+            ("JSON files", "*.json"),
+            ("XML files", "*.xml"),
+            ("LaTeX files", "*.tex"),
+            ("YAML files", "*.yaml;*.yml"),
+        ],
     )
     if filename:
         try:
@@ -31,9 +50,55 @@ def open_file(text_entry):
             elif filename.endswith(".pdf"):
                 with open(filename, 'rb') as pdf_file:
                     pdf_reader = PyPDF2.PdfReader(pdf_file)
-                    extracted_text = "".join(page.extract_text() for page in pdf_reader.pages)
+                    extracted_text = "".join(
+                        page.extract_text() for page in pdf_reader.pages
+                    )
                 text_entry.delete("1.0", tk.END)
                 text_entry.insert("1.0", extracted_text)
+            elif filename.endswith(".md"):
+                with open(filename, 'r') as f:
+                    markdown_text = markdown.markdown(f.read())
+                    text_entry.delete("1.0", tk.END)
+                    text_entry.insert("1.0", markdown_text)
+            elif filename.endswith(".rtf"):
+                with open(filename, 'r') as f:
+                    rtf_text = striprtf.striprtf(f.read())
+                    text_entry.delete("1.0", tk.END)
+                    text_entry.insert("1.0", rtf_text)
+            elif filename.endswith((".html", ".htm")):
+                with open(filename, 'r') as f:
+                    soup = BeautifulSoup(f.read(), "html.parser")
+                    html_text = soup.get_text()
+                    text_entry.delete("1.0", tk.END)
+                    text_entry.insert("1.0", html_text)
+            elif filename.endswith(".csv"):
+                csv_text = []
+                with open(filename, newline='') as f:
+                    reader = csv.reader(f)
+                    for row in reader:
+                        csv_text.append(", ".join(row))
+                    csv_text = "\n".join(csv_text)
+                text_entry.delete("1.0", tk.END)
+                text_entry.insert("1.0", csv_text)
+            elif filename.endswith(".json"):
+                with open(filename, 'r') as f:
+                    json_data = json.load(f)
+                    json_text = json.dumps(json_data, indent=4)
+                    text_entry.delete("1.0", tk.END)
+                    text_entry.insert("1.0", json_text)
+            elif filename.endswith(".xml"):
+                with open(filename, 'r') as f:
+                    tree = ET.parse(f)
+                    root = tree.getroot()
+                    xml_text = ET.tostring(root, encoding='utf-8', method='text').decode("utf-8")
+                    text_entry.delete("1.0", tk.END)
+                    text_entry.insert("1.0", xml_text)
+            elif filename.endswith((".yaml", ".yml")):
+                with open(filename, 'r') as f:
+                    yaml_data = yaml.safe_load(f)
+                    yaml_text = yaml.dump(yaml_data, indent=4)
+                    text_entry.delete("1.0", tk.END)
+                    text_entry.insert("1.0", yaml_text)
             else:
                 print(f"Unsupported file type: {filename}")
         except Exception as e:
