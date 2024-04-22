@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 import yaml
 
 # Define the Jaccard Similarity function
-def jaccard_similarity(text1, text2, shingle_size=3):
+def jaccard_similarity(text1, text2, shingle_size=4):
     shingles1 = set([text1[i:i + shingle_size] for i in range(len(text1) - shingle_size + 1)])
     shingles2 = set([text2[i:i + shingle_size] for i in range(len(text2) - shingle_size + 1)])
     intersection = shingles1.intersection(shingles2)
@@ -106,24 +106,30 @@ def open_file(text_entry):
 
 # Define the function to check plagiarism
 def check_plagiarism(text_entry1, text_entry2, result_label):
-  text1 = text_entry1.get("1.0", tk.END)[:-1]  # Remove trailing newline
-  text2 = text_entry2.get("1.0", tk.END)[:-1]
+    text1 = text_entry1.get("1.0", tk.END)[:-1].lower()
+    text2 = text_entry2.get("1.0", tk.END)[:-1].lower()
 
-  similarity = jaccard_similarity(text1.lower(), text2.lower())
-  intersection_text = ""  # Initialize to store formatted intersection
+    # Remove punctuation from both texts
+    text1 = ''.join(c for c in text1 if c not in set(".,?!:;-'"))
+    text2 = ''.join(c for c in text2 if c not in set(".,?!:;-'"))
 
-  for shingle in set(text1.lower().split()).intersection(set(text2.lower().split())):
-      intersection_text += shingle + " "  # You can customize the formatting here
+    similarity = jaccard_similarity(text1, text2)
+    intersection_text = ""
 
-  result_text = f"Jaccard Similarity Score: {similarity:.2f}\n"
-  result_text += f"Similar words / phrases: {intersection_text}\n"
+    for shingle in set(text1.split()).intersection(set(text2.split())):
+        if len(shingle) > 0:
+            intersection_text += shingle + " "
 
-  if similarity > 0.7:
-    result_text += "High similarity detected, potential plagiarism found!"
-  else:
-    result_text += "Similarity is low, likely original content."
+    result_text = f"Jaccard Similarity Score: {similarity:.2f}\n"
+    result_text += f"Similar words / phrases: {intersection_text}\n"
 
-  result_label.config(text=result_text)
+    if similarity > 0.7:
+        result_text += "High similarity detected, potential plagiarism found!"
+    else:
+        result_text += "Similarity is low, likely original content."
+
+    result_label.config(text=result_text)
+
 
 # Define the main function
 def main():
