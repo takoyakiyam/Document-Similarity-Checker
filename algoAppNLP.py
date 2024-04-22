@@ -16,12 +16,13 @@ import yaml
 nltk.download('stopwords')
 
 # Define the Jaccard Similarity function
-def jaccard_similarity(text1, text2, shingle_size=4):
-    shingles1 = set((text1[i:i + shingle_size],) for i in range(len(text1) - shingle_size + 1))
-    shingles2 = set((text2[i:i + shingle_size],) for i in range(len(text2) - shingle_size + 1))
-    intersection = shingles1.intersection(shingles2)
-    union = shingles1.union(shingles2)
-    return len(intersection) / len(union) if len(union) > 0 else 0
+def jaccard_similarity(text1, text2):
+  shingles1 = set(text1)
+  shingles2 = set(text2)
+  intersection = shingles1.intersection(shingles2)
+  union = shingles1.union(shingles2)
+  return len(intersection) / len(union) if len(union) > 0 else 0
+
 
 # Define the function to extract text from various file types
 def open_file(text_entry):
@@ -111,47 +112,52 @@ def open_file(text_entry):
 
 # Define the function to check plagiarism
 def check_plagiarism(text_entry1, text_entry2, result_label):
-    text1 = text_entry1.get("1.0", tk.END)[:-1].lower()
-    text2 = text_entry2.get("1.0", tk.END)[:-1].lower()
+  text1 = text_entry1.get("1.0", tk.END)[:-1].lower()
+  text2 = text_entry2.get("1.0", tk.END)[:-1].lower()
 
-    # Remove stop words (optional)
-    stop_words = stopwords.words('english')
-    text1_filtered = [word for word in text1.split() if word not in stop_words]
-    text2_filtered = [word for word in text2.split() if word not in stop_words]
+  # Remove stop words (optional)
+  stop_words = stopwords.words('english')
+  text1_filtered = [word for word in text1.split() if word not in stop_words]
+  text2_filtered = [word for word in text2.split() if word not in stop_words]
 
-    # Parts of Speech Tagging
-    text1_pos = nltk.pos_tag(nltk.word_tokenize(text1))
-    text2_pos = nltk.pos_tag(nltk.word_tokenize(text2))
+  # Parts of Speech Tagging
+  text1_pos = nltk.pos_tag(nltk.word_tokenize(text1))
+  text2_pos = nltk.pos_tag(nltk.word_tokenize(text2))
 
-    # Perform lemmatization or stemming
-    wnl = nltk.WordNetLemmatizer()
-    text1_lemma = [wnl.lemmatize(word) for word, pos in text1_pos]
-    text2_lemma = [wnl.lemmatize(word) for word, pos in text2_pos]
+  # Perform lemmatization or stemming
+  wnl = nltk.WordNetLemmatizer()
+  text1_lemma = [wnl.lemmatize(word) for word, pos in text1_pos]
+  text2_lemma = [wnl.lemmatize(word) for word, pos in text2_pos]
 
-   # Jaccard similarity with word-level check
-    similarity_word = jaccard_similarity(tuple(text1_filtered), tuple(text2_filtered))
+  # Jaccard similarity with word-level check
+  similarity_word = jaccard_similarity(tuple(text1_filtered), tuple(text2_filtered))
 
-    # Jaccard similarity with lemmatized words
-    similarity_lemma = jaccard_similarity(tuple(text1_lemma), tuple(text2_lemma))
+  # Jaccard similarity with lemmatized words
+  similarity_lemma = jaccard_similarity(tuple(text1_lemma), tuple(text2_lemma))
 
-    intersection_text = ""
-    for shingle in set(text1_filtered).intersection(set(text2_filtered)):
-        if len(shingle) > 0:
-            intersection_text += shingle + " "
+  intersection_text = ""
+  for shingle in set(text1_filtered).intersection(set(text2_filtered)):
+    if len(shingle) > 0:
+      intersection_text += shingle + " "
 
-    result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
-    result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n\n"
+  result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
+  result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n\n"
 
-    if similarity_word > 0.7 or similarity_lemma > 0.7:
-        result_text = "High similarity detected, potential plagiarism found!\n\n"
-        result_text += f"Similar words / phrases: {intersection_text}"
-        result_label.config(fg="red", text=result_text)
-    else:
-        result_text += "Similarity is low, likely original content.\n\n"
-        result_text += f"Similar words / phrases: {intersection_text}"
-        result_label.config(fg="green", text=result_text)
+  if similarity_word >= 0.8 and similarity_lemma >= 0.8:  # High Threshold for Strong Plagiarism
+    result_text = "High similarity detected, strong evidence of plagiarism found!\n\n"
+    result_text += f"Similar words / phrases: {intersection_text}"
+    result_label.config(fg="red", text=result_text)
+  elif similarity_word >= 0.5 or similarity_lemma >= 0.5:  # Medium Threshold for Potential Plagiarism
+    result_text = "Moderate similarity detected, potential plagiarism found.\n\n"
+    result_text += "Possible paraphrasing or close rephrasing of the source material.\n"
+    result_text += f"Review the highlighted similarities ({intersection_text}) and consider revising to ensure proper citation.\n"
+    result_label.config(fg="orange", text=result_text)
+  else:
+    result_text += "Similarity is low, likely original content.\n\n"
+    result_text += f"Similar words / phrases: {intersection_text}"
+    result_label.config(fg="green", text=result_text)
 
-    result_label.config(text=result_text)
+  result_label.config(text=result_text)
 
 # Define the main function
 def main():
