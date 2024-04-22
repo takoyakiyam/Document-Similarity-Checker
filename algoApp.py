@@ -106,14 +106,24 @@ def open_file(text_entry):
 
 # Define the function to check plagiarism
 def check_plagiarism(text_entry1, text_entry2, result_label):
-    text1 = text_entry1.get("1.0", tk.END)[:-1]  # Remove trailing newline
-    text2 = text_entry2.get("1.0", tk.END)[:-1]
-    similarity = jaccard_similarity(text1.lower(), text2.lower())
-    result_label.config(text=f"Jaccard Similarity Score: {similarity:.2f}")
-    if similarity > 0.7:
-        result_label.config(text=result_label.cget("text") + "\nHigh similarity detected, potential plagiarism found!")
-    else:
-        result_label.config(text=result_label.cget("text") + "\nSimilarity is low, likely original content.")
+  text1 = text_entry1.get("1.0", tk.END)[:-1]  # Remove trailing newline
+  text2 = text_entry2.get("1.0", tk.END)[:-1]
+
+  similarity = jaccard_similarity(text1.lower(), text2.lower())
+  intersection_text = ""  # Initialize to store formatted intersection
+
+  for shingle in set(text1.lower().split()).intersection(set(text2.lower().split())):
+      intersection_text += shingle + " "  # You can customize the formatting here
+
+  result_text = f"Jaccard Similarity Score: {similarity:.2f}\n"
+  result_text += f"Similar words / phrases: {intersection_text}\n"
+
+  if similarity > 0.7:
+    result_text += "High similarity detected, potential plagiarism found!"
+  else:
+    result_text += "Similarity is low, likely original content."
+
+  result_label.config(text=result_text)
 
 # Define the main function
 def main():
