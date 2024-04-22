@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import PyPDF2
 import docx
 import markdown
@@ -124,9 +125,15 @@ def check_plagiarism(text_entry1, text_entry2, result_label):
     result_text += f"Similar words / phrases: {intersection_text}\n"
 
     if similarity > 0.7:
-        result_text += "High similarity detected, potential plagiarism found!"
+        result_text = "High similarity detected, potential plagiarism found!\n\n"
+        result_text += f"Similar words / phrases: {intersection_text}"
+        result_label.config(fg="red", text=result_text)
+        messagebox.showerror("Plagiarism Alert", result_text)
     else:
-        result_text += "Similarity is low, likely original content."
+        result_text = "Similarity is low, likely original content.\n\n"
+        result_text += f"Similar words / phrases: {intersection_text}"
+        result_label.config(fg="green", text=result_text)
+        messagebox.showinfo("No Plagiarism", result_text)
 
     result_label.config(text=result_text)
 
@@ -136,28 +143,48 @@ def main():
     root = tk.Tk()
     root.title("Plagiarism Checker")
 
-    # Create text entry widgets
-    text_entry1 = tk.Text(root, height=10, width=50)
-    text_entry2 = tk.Text(root, height=10, width=50)
+    # Create a frame to hold the widgets
+    frame = tk.Frame(root, bg="white", padx=20)
+    frame.pack(fill=tk.BOTH, expand=True)
 
-    # Create buttons for opening files and checking plagiarism
-    open_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
-    open_button2 = tk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
-    check_button = tk.Button(root, text="Check Plagiarism", command=lambda: check_plagiarism(text_entry1, text_entry2, result_label))
+    # Create text entry widgets
+    text_entry1 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
+    text_entry1.pack(pady=10)
+
+    open_button1 = tk.Button(frame, text="Open File 1", command=lambda: open_file(text_entry1), bg="lightblue", fg="black")
+    open_button1.pack(pady=5, anchor="w")
+
+    clear_button1 = tk.Button(frame, text="Clear Text", command=lambda: clear_text(text_entry1), bg="red", fg="white")
+    clear_button1.pack(pady=5, anchor="w")
+
+    text_entry2 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
+    text_entry2.pack(pady=10)
+
+    open_button2 = tk.Button(frame, text="Open File 2", command=lambda: open_file(text_entry2), bg="lightblue", fg="black")
+    open_button2.pack(pady=5, anchor="w")
+
+    clear_button2 = tk.Button(frame, text="Clear Text", command=lambda: clear_text(text_entry2), bg="red", fg="white")
+    clear_button2.pack(pady=5, anchor="w")
+
+    check_button = tk.Button(frame, text="Check Plagiarism", command=lambda: check_plagiarism(text_entry1, text_entry2, result_label), bg="green", fg="white")
+    check_button.pack(pady=10)
+
+    clear_button = tk.Button(frame, text="Clear all Texts", command=lambda: clear_all_text(text_entry1, text_entry2) , bg="red", fg="white")
+    clear_button.pack(pady=5, anchor="w")
 
     # Create a label to display the result
-    result_label = tk.Label(root, text="Jaccard Similarity Score: N/A")
-
-    # Organize the layout with grid or pack
-    text_entry1.pack(pady=10)
-    open_button1.pack(pady=5)
-    text_entry2.pack(pady=10)
-    open_button2.pack(pady=5)
-    check_button.pack(pady=10)
+    result_label = tk.Label(frame, text="Jaccard Similarity Score: N/A", font=("Arial", 12), bg="white")
     result_label.pack(pady=10)
 
     # Start the Tkinter main loop
     root.mainloop()
+
+def clear_text(text_entry):
+    text_entry.delete("1.0", tk.END)
+
+def clear_all_text(text_entry1, text_entry2):
+    text_entry1.delete("1.0", tk.END) 
+    text_entry2.delete("1.0", tk.END)
 
 # Call the main function when the script is executed
 if __name__ == "__main__":
