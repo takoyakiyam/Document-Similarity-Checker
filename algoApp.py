@@ -147,30 +147,40 @@ def main():
     frame = tk.Frame(root, bg="white", padx=20)
     frame.pack(fill=tk.BOTH, expand=True)
 
-    # Create text entry widgets
+    # Create the text entry widget and add it to the frame
     text_entry1 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
     text_entry1.pack(pady=10)
 
-    open_button1 = tk.Button(frame, text="Open File 1", command=lambda: open_file(text_entry1), bg="lightblue", fg="black")
-    open_button1.pack(pady=5, anchor="w")
+    # Create a frame for the open and clear buttons
+    open_clear_frame = tk.Frame(frame, bg="white")
+    open_clear_frame.pack(pady=5, anchor="w")
 
-    clear_button1 = tk.Button(frame, text="Clear Text", command=lambda: clear_text(text_entry1), bg="red", fg="white")
-    clear_button1.pack(pady=5, anchor="w")
+    # Create the open button and add it to the open_clear_frame
+    open_button1 = tk.Button(open_clear_frame, text="Open File 1", command=lambda: open_file(text_entry1), bg="lightblue", fg="black")
+    open_button1.pack(side=tk.LEFT, padx=5)
 
+    # Create the clear button and add it to the open_clear_frame
+    clear_button1 = tk.Button(open_clear_frame, text="Clear Text", command=lambda: clear_text(text_entry1), bg="red", fg="white")
+    clear_button1.pack(side=tk.LEFT, padx=5)
+
+    # Create the text entry widget and add it to the frame
     text_entry2 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
     text_entry2.pack(pady=10)
 
-    open_button2 = tk.Button(frame, text="Open File 2", command=lambda: open_file(text_entry2), bg="lightblue", fg="black")
-    open_button2.pack(pady=5, anchor="w")
+    # Create a frame for the open and clear buttons
+    open_clear_frame = tk.Frame(frame, bg="white")
+    open_clear_frame.pack(pady=5, anchor="w")
 
-    clear_button2 = tk.Button(frame, text="Clear Text", command=lambda: clear_text(text_entry2), bg="red", fg="white")
-    clear_button2.pack(pady=5, anchor="w")
+    # Create the open button and add it to the open_clear_frame
+    open_button2 = tk.Button(open_clear_frame, text="Open File 2", command=lambda: open_file(text_entry2), bg="lightblue", fg="black")
+    open_button2.pack(side=tk.LEFT, padx=5)
+
+    # Create the clear button and add it to the open_clear_frame
+    clear_button2 = tk.Button(open_clear_frame, text="Clear Text", command=lambda: clear_text(text_entry2), bg="red", fg="white")
+    clear_button2.pack(side=tk.LEFT, padx=5)
 
     check_button = tk.Button(frame, text="Check Plagiarism", command=lambda: check_plagiarism(text_entry1, text_entry2, result_label), bg="green", fg="white")
     check_button.pack(pady=10)
-
-    clear_button = tk.Button(frame, text="Clear all Texts", command=lambda: clear_all_text(text_entry1, text_entry2) , bg="red", fg="white")
-    clear_button.pack(pady=5, anchor="w")
 
     # Create a label to display the result
     result_label = tk.Label(frame, text="Jaccard Similarity Score: N/A", font=("Arial", 12), bg="white")
@@ -181,10 +191,6 @@ def main():
 
 def clear_text(text_entry):
     text_entry.delete("1.0", tk.END)
-
-def clear_all_text(text_entry1, text_entry2):
-    text_entry1.delete("1.0", tk.END) 
-    text_entry2.delete("1.0", tk.END)
 
 # Call the main function when the script is executed
 if __name__ == "__main__":
