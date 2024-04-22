@@ -122,18 +122,16 @@ def check_plagiarism(text_entry1, text_entry2, result_label):
             intersection_text += shingle + " "
 
     result_text = f"Jaccard Similarity Score: {similarity:.2f}\n"
-    result_text += f"Similar words / phrases: {intersection_text}\n"
 
     if similarity > 0.7:
         result_text = "High similarity detected, potential plagiarism found!\n\n"
         result_text += f"Similar words / phrases: {intersection_text}"
         result_label.config(fg="red", text=result_text)
-        messagebox.showerror("Plagiarism Alert", result_text)
     else:
-        result_text = "Similarity is low, likely original content.\n\n"
+        result_text += "Similarity is low, likely original content.\n\n"
         result_text += f"Similar words / phrases: {intersection_text}"
         result_label.config(fg="green", text=result_text)
-        messagebox.showinfo("No Plagiarism", result_text)
+
 
     result_label.config(text=result_text)
 
