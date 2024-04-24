@@ -1,6 +1,6 @@
-// This project is a requirement for CS 006 - Algorithms and Complexity for TIP QC
-// CS32S1
-// This is a simple plagiarism checker using multiple python libraries
+This project is a requirement for CS 006 - Algorithms and Complexity for TIP QC
+CS32S1
+This is a simple plagiarism checker using multiple python libraries
 
 This Python program provides a basic plagiarism checker for textual content. It allows you to compare two text inputs (source and suspected copy) and calculates similarity scores using different techniques.
 
@@ -26,4 +26,8 @@ Low Similarity: A low similarity score suggests the content is likely original.
 
 Disclaimer:
 This is a basic plagiarism checker for educational purposes. It might not capture all plagiarism techniques and for critical tasks, consider using more advanced plagiarism detection tools.
+
+for program demonstration, run:
+pip install nltk tkinter PyPDF2 docx markdown striprtf beautifulsoup4 csv json xml.etree sklearn numpy matplotlib
+
 
