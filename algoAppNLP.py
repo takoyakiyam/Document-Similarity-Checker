@@ -159,6 +159,11 @@ def check_plagiarism(text_entry1, text_entry2, result_label):
 
   result_label.config(text=result_text)
 
+def update_word_count(text_entry, word_count_label):
+    word_count = len(text_entry.get("1.0", tk.END).strip().split())
+    word_count_label.config(text=f"Word Count: {word_count}")
+
+
 # Define the main function
 def main():
     root = tk.Tk()
@@ -170,7 +175,12 @@ def main():
 
     # Create the text entry widget and add it to the frame
     text_entry1 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
+    text_entry1.bind("<KeyRelease>", lambda event: update_word_count(text_entry1, word_count_label1))
     text_entry1.pack(pady=10)
+
+    # Create a label to display word count for text_entry1
+    word_count_label1 = tk.Label(frame, text="Word Count: 0")
+    word_count_label1.pack(pady=2, anchor="e")
 
     # Create a frame for the open and clear buttons
     open_clear_frame = tk.Frame(frame, bg="white")
@@ -186,7 +196,11 @@ def main():
 
     # Create the text entry widget and add it to the frame
     text_entry2 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
+    text_entry2.bind("<KeyRelease>", lambda event: update_word_count(text_entry2, word_count_label2))
     text_entry2.pack(pady=10)
+
+    word_count_label2 = tk.Label(frame, text="Word Count: 0")
+    word_count_label2.pack(pady=2, anchor='e')
 
     # Create a frame for the open and clear buttons
     open_clear_frame = tk.Frame(frame, bg="white")
@@ -204,7 +218,7 @@ def main():
     check_button.pack(pady=10)
 
     # Create a label to display the result
-    result_label = tk.Label(frame, text="Jaccard Similarity Score: N/A", font=("Arial", 12), bg="white")
+    result_label = tk.Label(frame, text="Jaccard Similarity Score: N/A", font=("Arial", 10), bg="white")
     result_label.pack(pady=10)
 
     # Start the Tkinter main loop
