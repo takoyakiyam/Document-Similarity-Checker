@@ -12,6 +12,9 @@ import csv
 import json
 import xml.etree.ElementTree as ET
 import yaml
+import sklearn
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 nltk.download('stopwords')
 
@@ -120,6 +123,14 @@ def check_plagiarism(text_entry1, text_entry2, result_label):
   text1_filtered = [word for word in text1.split() if word not in stop_words]
   text2_filtered = [word for word in text2.split() if word not in stop_words]
 
+  # Perform TF-IDF vectorization
+  vectorizer = TfidfVectorizer()
+  X1 = vectorizer.fit_transform(text1_filtered) 
+  X2 = vectorizer.transform(text2_filtered)
+
+  # Cosine similarity with TF-IDF vectors
+  similarity_tfidf = cosine_similarity(X1, X2)
+
   # Parts of Speech Tagging
   text1_pos = nltk.pos_tag(nltk.word_tokenize(text1))
   text2_pos = nltk.pos_tag(nltk.word_tokenize(text2))
@@ -141,16 +152,18 @@ def check_plagiarism(text_entry1, text_entry2, result_label):
       intersection_text += shingle + " "
 
   result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
-  result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n\n"
+  result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
+  result_text += f"Cosine Similarity Score (TF-IDF): {similarity_tfidf[0][0]:.2f}\n\n"
 
-  if similarity_word >= 0.8 and similarity_lemma >= 0.8:  # High Threshold for Strong Plagiarism
-    result_text = "High similarity detected, strong evidence of plagiarism found!\n\n"
+  if similarity_word >= 0.8 and similarity_lemma >= 0.8 and similarity_tfidf[0][0] >= 0.8:  # High Threshold for Strong Plagiarism
+    result_text += "High similarity detected, strong evidence of plagiarism found!\n\n"
     result_text += f"Similar words / phrases: {intersection_text}"
     result_label.config(fg="red", text=result_text)
-  elif similarity_word >= 0.5 or similarity_lemma >= 0.5:  # Medium Threshold for Potential Plagiarism
-    result_text = "Moderate similarity detected, potential plagiarism found.\n\n"
+  elif similarity_word >= 0.5 or similarity_lemma >= 0.5 and similarity_tfidf[0][0] >= 0.8:  # Medium Threshold for Potential Plagiarism
+    result_text += "Moderate similarity detected, potential plagiarism found.\n\n"
     result_text += "Possible paraphrasing or close rephrasing of the source material.\n"
-    result_text += f"Review the highlighted similarities ({intersection_text}) and consider revising to ensure proper citation.\n"
+    result_text += f"Similar words / phrases: {intersection_text}"
+    result_text += f"\nReview the highlighted similar words and consider revising to ensure proper citation.\n"
     result_label.config(fg="orange", text=result_text)
   else:
     result_text += "Similarity is low, likely original content.\n\n"
@@ -202,7 +215,7 @@ def main():
    # frame for 2nd text entry features
     features_frame2 = tk.Frame(frame, bg="white")
     features_frame2.pack(pady=5, fill=tk.X)
-
+    
     word_count_label2 = tk.Label(features_frame2, text="Word Count: 0")
     word_count_label2.pack(pady=2, anchor="e", side="right")
 
@@ -218,7 +231,7 @@ def main():
     check_button.pack(pady=10)
 
     # Create a label to display the result
-    result_label = tk.Label(frame, text="Jaccard Similarity Score: N/A", font=("Arial", 10), bg="white")
+    result_label = tk.Label(frame, text="", font=("Arial", 10), bg="white")
     result_label.pack(pady=10)
 
     # Start the Tkinter main loop
