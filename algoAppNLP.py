@@ -172,46 +172,46 @@ def main():
     # Create a frame to hold the widgets
     frame = tk.Frame(root, bg="white", padx=20)
     frame.pack(fill=tk.BOTH, expand=True)
-
+    
     # Create the text entry widget and add it to the frame
     text_entry1 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
     text_entry1.bind("<KeyRelease>", lambda event: update_word_count(text_entry1, word_count_label1))
     text_entry1.pack(pady=10)
 
-    # Create a label to display word count for text_entry1
-    word_count_label1 = tk.Label(frame, text="Word Count: 0")
-    word_count_label1.pack(pady=2, anchor="e")
-
     # Create a frame for the open and clear buttons
-    open_clear_frame = tk.Frame(frame, bg="white")
-    open_clear_frame.pack(pady=5, anchor="w")
+    features_frame = tk.Frame(frame, bg="white")
+    features_frame.pack(pady=5, fill=tk.X)
+
+    # Create a label to display word count for text_entry1
+    word_count_label1 = tk.Label(features_frame, text="Word Count: 0")
+    word_count_label1.pack(pady=2, anchor="e", side="right")
 
     # Create the open button and add it to the open_clear_frame
-    open_button1 = tk.Button(open_clear_frame, text="Open File 1", command=lambda: open_file(text_entry1), bg="lightblue", fg="black")
+    open_button1 = tk.Button(features_frame, text="Open File 1", command=lambda: open_file(text_entry1), bg="lightblue", fg="black")
     open_button1.pack(side=tk.LEFT, padx=5)
 
     # Create the clear button and add it to the open_clear_frame
-    clear_button1 = tk.Button(open_clear_frame, text="Clear Text", command=lambda: clear_text(text_entry1), bg="red", fg="white")
+    clear_button1 = tk.Button(features_frame, text="Clear Text", command=lambda: clear_text(text_entry1), bg="red", fg="white")
     clear_button1.pack(side=tk.LEFT, padx=5)
 
     # Create the text entry widget and add it to the frame
     text_entry2 = tk.Text(frame, height=10, width=50, bd=2, relief="solid")
     text_entry2.bind("<KeyRelease>", lambda event: update_word_count(text_entry2, word_count_label2))
     text_entry2.pack(pady=10)
+    
+   # frame for 2nd text entry features
+    features_frame2 = tk.Frame(frame, bg="white")
+    features_frame2.pack(pady=5, fill=tk.X)
 
-    word_count_label2 = tk.Label(frame, text="Word Count: 0")
-    word_count_label2.pack(pady=2, anchor='e')
-
-    # Create a frame for the open and clear buttons
-    open_clear_frame = tk.Frame(frame, bg="white")
-    open_clear_frame.pack(pady=5, anchor="w")
+    word_count_label2 = tk.Label(features_frame2, text="Word Count: 0")
+    word_count_label2.pack(pady=2, anchor="e", side="right")
 
     # Create the open button and add it to the open_clear_frame
-    open_button2 = tk.Button(open_clear_frame, text="Open File 2", command=lambda: open_file(text_entry2), bg="lightblue", fg="black")
+    open_button2 = tk.Button(features_frame2, text="Open File 2", command=lambda: open_file(text_entry2), bg="lightblue", fg="black")
     open_button2.pack(side=tk.LEFT, padx=5)
 
     # Create the clear button and add it to the open_clear_frame
-    clear_button2 = tk.Button(open_clear_frame, text="Clear Text", command=lambda: clear_text(text_entry2), bg="red", fg="white")
+    clear_button2 = tk.Button(features_frame2, text="Clear Text", command=lambda: clear_text(text_entry2), bg="red", fg="white")
     clear_button2.pack(side=tk.LEFT, padx=5)
 
     check_button = tk.Button(frame, text="Check Plagiarism", command=lambda: check_plagiarism(text_entry1, text_entry2, result_label), bg="green", fg="white")
