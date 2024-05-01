@@ -159,7 +159,7 @@ def check_plagiarism(text_entry1, text_entry2, result_label):
     result_text += "High similarity detected, strong evidence of plagiarism found!\n\n"
     result_text += f"Similar words / phrases: {intersection_text}"
     result_label.config(fg="red", text=result_text)
-  elif similarity_word >= 0.5 or similarity_lemma >= 0.5 and similarity_tfidf[0][0] >= 0.8:  # Medium Threshold for Potential Plagiarism
+  elif similarity_word >= 0.5 or similarity_lemma >= 0.5 or similarity_tfidf[0][0] >= 0.5:  # Medium Threshold for Potential Plagiarism
     result_text += "Moderate similarity detected, potential plagiarism found.\n\n"
     result_text += "Possible paraphrasing or close rephrasing of the source material.\n"
     result_text += f"Similar words / phrases: {intersection_text}"
