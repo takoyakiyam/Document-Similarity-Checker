@@ -1,3 +1,5 @@
+# JOHAN SANTOS - TIP QC
+
 import nltk
 from nltk.corpus import stopwords
 import tkinter as tk
@@ -17,6 +19,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
 
 # Define the Jaccard Similarity function
 def jaccard_similarity(text1, text2):
