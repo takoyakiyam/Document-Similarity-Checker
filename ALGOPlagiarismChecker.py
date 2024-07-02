@@ -1,4 +1,5 @@
 import nltk
+import time
 from nltk.corpus import stopwords
 import tkinter as tk
 from tkinter import filedialog, ttk
@@ -14,7 +15,6 @@ import xml.etree.ElementTree as ET
 import yaml
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import time
 
 # Download NLTK resources if not already downloaded
 nltk.download('stopwords')
@@ -117,10 +117,9 @@ def open_file(text_entry):
             print(f"Error opening file: {e}")
 
 # Define the scheduling algorithms with actual processing logic
-def round_robin(text1, text2):
+def round_robin(text1, text2, chunk_size=25):
     start_time = time.time()
     # Simulate processing logic by iterating through text in chunks
-    chunk_size = 25
     chunks1 = [text1[i:i+chunk_size] for i in range(0, len(text1), chunk_size)]
     chunks2 = [text2[i:i+chunk_size] for i in range(0, len(text2), chunk_size)]
     similar_count = 0
@@ -162,9 +161,9 @@ def priority_scheduling(text1, text2):
     return "Priority Scheduling", finish_time, similar_count
 
 # Determine which scheduling algorithm to use based on selection
-def get_scheduling_algorithm(algo, text1, text2):
+def get_scheduling_algorithm(algo, text1, text2, chunk_size=25):
     if algo == "Round Robin":
-        return round_robin(text1, text2)
+        return round_robin(text1, text2, chunk_size)
     elif algo == "Shortest Job Next":
         return shortest_job_next(text1, text2)
     elif algo == "Priority Scheduling":
@@ -173,7 +172,11 @@ def get_scheduling_algorithm(algo, text1, text2):
         return "No algorithm selected.", 0, 0
 
 # Define the function to check plagiarism
-def check_plagiarism(text_entry1, text_entry2, result_label, algo):
+def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=None):
+    
+    if algo == "Round Robin" and chunk_size is None:
+        chunk_size = 25
+        
     text1 = text_entry1.get("1.0", tk.END)[:-1].lower()
     text2 = text_entry2.get("1.0", tk.END)[:-1].lower()
 
@@ -209,7 +212,7 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo):
     similar_word_count = len(set(text1_filtered).intersection(set(text2_filtered)))
 
     # Apply selected algorithm for text processing
-    algo_name, processing_time, similar_count = get_scheduling_algorithm(algo, text1, text2)
+    algo_name, processing_time, similar_count = get_scheduling_algorithm(algo, text1, text2, chunk_size)
 
     result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
     result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
@@ -242,7 +245,16 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo):
     # Create a button to save the result as PDF (only once)
     if not hasattr(root, 'save_pdf_button'):
         root.save_pdf_button = tk.Button(root, text="Save as PDF", command=save_as_pdf)
-        root.save_pdf_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+        root.save_pdf_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+# Show/hide chunk size entry based on selected algorithm
+def on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var):
+    if algo_var.get() == "Round Robin":
+        chunk_size_label.grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
+        chunk_size_entry.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+    else:
+        chunk_size_label.grid_remove()
+        chunk_size_entry.grid_remove()
 
 # GUI setup
 def main():
@@ -254,34 +266,47 @@ def main():
     text_entry1 = tk.Text(root, height=10, width=50)
     text_entry1.grid(row=0, column=0, padx=10, pady=10)
 
+    open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
+    open_file_button1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
+
     text_entry2 = tk.Text(root, height=10, width=50)
     text_entry2.grid(row=0, column=1, padx=10, pady=10)
 
+    open_file_button2 = tk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
+    open_file_button2.grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
+
     # Result Label
     result_label = tk.Label(root, text="", justify=tk.LEFT, wraplength=700)
-    result_label.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+    result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
     # Algorithm Selection Dropdown
     algo_label = tk.Label(root, text="Select Scheduling Algorithm:")
-    algo_label.grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
+    algo_label.grid(row=3, column=0, padx=10, pady=5, sticky=tk.E)
 
     algorithms = ["Round Robin", "Shortest Job Next", "Priority Scheduling"]
     algo_var = tk.StringVar(root)
-    algo_var.set(algorithms[0])  # Default selection
+    algo_var.set(algorithms[2])  # Default selection
 
     algo_dropdown = ttk.Combobox(root, textvariable=algo_var, values=algorithms, state="readonly")
-    algo_dropdown.grid(row=2, column=1, padx=10, pady=5, sticky=tk.W)
+    algo_dropdown.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
+
+    # Chunk Size for Round Robin
+    chunk_size_label = tk.Label(root, text="Chunk Size:")
+    chunk_size_entry = tk.Entry(root)
+    chunk_size_entry.insert(0, "25")
+
+    # Show/hide chunk size entry based on selected algorithm
+    algo_dropdown.bind("<<ComboboxSelected>>", lambda event: on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var))
 
     # Button to check plagiarism
-    check_button = tk.Button(root, text="Check Plagiarism", command=lambda: check_plagiarism(text_entry1, text_entry2, result_label, algo_var.get()))
-    check_button.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
-
-    # Button to open files
-    open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
-    open_file_button1.grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
-
-    open_file_button2 = tk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
-    open_file_button2.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+    check_button = tk.Button(root, text="Check Plagiarism", 
+                         command=lambda: check_plagiarism(
+                             text_entry1, 
+                             text_entry2, 
+                             result_label, 
+                             algo_var.get(), 
+                             int(chunk_size_entry.get()) if algo_var.get() == "Round Robin" else None))
+    check_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
     root.mainloop()
 
