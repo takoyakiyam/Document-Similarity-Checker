@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import stopwords
 import tkinter as tk
 from tkinter import filedialog, ttk
+from fpdf import FPDF
 import PyPDF2
 import docx
 import markdown
@@ -118,33 +119,47 @@ def open_file(text_entry):
 # Define the scheduling algorithms with actual processing logic
 def round_robin(text1, text2):
     start_time = time.time()
-
-    # Dummy processing logic - replace with actual algorithm
-    time.sleep(0.1)  # Simulate processing time
-
+    # Simulate processing logic by iterating through text in chunks
+    chunk_size = 25
+    chunks1 = [text1[i:i+chunk_size] for i in range(0, len(text1), chunk_size)]
+    chunks2 = [text2[i:i+chunk_size] for i in range(0, len(text2), chunk_size)]
+    similar_count = 0
+    for chunk1, chunk2 in zip(chunks1, chunks2):
+        if chunk1 == chunk2:
+            similar_count += 1
+        time.sleep(0.01)  # Simulate processing time for each chunk
     end_time = time.time()
     finish_time = end_time - start_time
-    return "Round Robin", finish_time
+    return "Round Robin", finish_time, similar_count
 
 def shortest_job_next(text1, text2):
     start_time = time.time()
-
-    # Dummy processing logic - replace with actual algorithm
-    time.sleep(0.2)  # Simulate processing time
-
+    # Simulate processing logic by processing the shorter text first
+    short_text, long_text = (text1, text2) if len(text1) <= len(text2) else (text2, text1)
+    similar_count = 0
+    for i in range(len(short_text)):
+        if short_text[i] == long_text[i]:
+            similar_count += 1
+        time.sleep(0.01)  # Simulate processing time for each character
+    for i in range(len(short_text), len(long_text)):
+        time.sleep(0.01)  # Continue processing the longer text
     end_time = time.time()
     finish_time = end_time - start_time
-    return "Shortest Job Next", finish_time
+    return "Shortest Job Next", finish_time, similar_count
 
 def priority_scheduling(text1, text2):
     start_time = time.time()
-
-    # Dummy processing logic - replace with actual algorithm
-    time.sleep(0.3)  # Simulate processing time
-
+    # Simulate processing logic by prioritizing word-level similarity
+    words1 = text1.split()
+    words2 = text2.split()
+    similar_count = 0
+    for word1, word2 in zip(words1, words2):
+        if word1 == word2:
+            similar_count += 1
+        time.sleep(0.01)  # Simulate processing time for each word
     end_time = time.time()
     finish_time = end_time - start_time
-    return "Priority Scheduling", finish_time
+    return "Priority Scheduling", finish_time, similar_count
 
 # Determine which scheduling algorithm to use based on selection
 def get_scheduling_algorithm(algo, text1, text2):
@@ -155,7 +170,7 @@ def get_scheduling_algorithm(algo, text1, text2):
     elif algo == "Priority Scheduling":
         return priority_scheduling(text1, text2)
     else:
-        return "No algorithm selected.", 0
+        return "No algorithm selected.", 0, 0
 
 # Define the function to check plagiarism
 def check_plagiarism(text_entry1, text_entry2, result_label, algo):
@@ -190,67 +205,48 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo):
     # Jaccard similarity with lemmatized words
     similarity_lemma = jaccard_similarity(tuple(text1_lemma), tuple(text2_lemma))
 
-    intersection_text = ""
-    for shingle in set(text1_filtered).intersection(set(text2_filtered)):
-        if len(shingle) > 0:
-            intersection_text += shingle + " "
+    # Count of similar words
+    similar_word_count = len(set(text1_filtered).intersection(set(text2_filtered)))
 
-    # Get scheduling algorithm and its time
-    scheduling_algo, processing_time = get_scheduling_algorithm(algo, text1, text2)
+    # Apply selected algorithm for text processing
+    algo_name, processing_time, similar_count = get_scheduling_algorithm(algo, text1, text2)
 
     result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
     result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
     result_text += f"Cosine Similarity Score (TF-IDF): {similarity_tfidf[0][0]:.2f}\n"
-    result_text += f"Scheduling Algorithm: {scheduling_algo}\n"
-    result_text += f"Processing Time: {processing_time:.2f} seconds\n\n"
+    result_text += f"Count of Similar Words: {similar_word_count}\n"
+    result_text += f"Scheduling Algorithm: {algo_name}\n"
+    result_text += f"Processing Time: {processing_time:.2f} seconds\n"
+    result_text += f"Similar Count from Algorithm: {similar_count}\n"
 
     if similarity_word >= 0.8 and similarity_lemma >= 0.8 and similarity_tfidf[0][0] >= 0.8:  # High Threshold for Plagiarism
         result_text += "High similarity detected, possible plagiarism found!\n\n"
-        result_text += f"Identical or very similar content detected.\n"
-        result_text += f"Similar words / phrases: {intersection_text}"
+        result_text += "Identical or very similar content detected."
         result_label.config(fg="red", text=result_text)
     elif similarity_word >= 0.5 or similarity_lemma >= 0.5 or similarity_tfidf[0][0] >= 0.5:  # Medium Threshold for Potential Plagiarism
         result_text += "Moderate similarity detected, potential plagiarism found.\n\n"
         result_text += "Possible paraphrasing or close rephrasing of the source material.\n"
-        result_text += f"Similar words / phrases: {intersection_text}"
-        result_text += f"\nReview the highlighted similar words and consider revising to ensure proper citation.\n"
         result_label.config(fg="orange", text=result_text)
     else:
         result_text += "Low similarity detected, no strong evidence of plagiarism.\n"
         result_label.config(fg="green", text=result_text)
 
-    # Additional metrics for comparison
-    completion_times = {}
-    average_waiting_times = {}
-    turnaround_times = {}
-    context_switches = {}
-    throughputs = {}
-    cpu_utilizations = {}
+    # Save result to PDF function
+    def save_as_pdf():
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, result_text)
+        pdf.output("plagiarism_report.pdf")
 
-    # Run the selected algorithm and collect metrics
-    algo_name, time_taken = get_scheduling_algorithm(algo, text1, text2)
-    
-    completion_times[algo_name] = time_taken
-    average_waiting_times[algo_name] = 0  # Placeholder for average waiting time (not implemented in this example)
-    turnaround_times[algo_name] = time_taken  # Assuming turnaround time equals completion time in this simplified example
-    context_switches[algo_name] = 0  # Placeholder for context switches (not implemented in this example)
-    throughputs[algo_name] = 1 / time_taken  # Assuming throughput as 1 / completion time
-    cpu_utilizations[algo_name] = time_taken / 0.3 * 100  # Assuming maximum CPU utilization for comparison
-
-    # Display comparison metrics for the selected algorithm
-    result_text += "\n\n--- Scheduling Algorithm Comparison ---\n\n"
-    result_text += "Metric\t\t\t{}\n".format(algo_name)
-    result_text += "Completion Time\t\t{:.2f} seconds\n".format(completion_times[algo_name])
-    result_text += "Average Waiting Time\t{:.2f} seconds\n".format(average_waiting_times[algo_name])
-    result_text += "Turnaround Time\t\t{:.2f} seconds\n".format(turnaround_times[algo_name])
-    result_text += "Context Switches\t\t{}\n".format(context_switches[algo_name])
-    result_text += "Throughput\t\t\t{:.2f} jobs/sec\n".format(throughputs[algo_name])
-    result_text += "CPU Utilization\t\t{:.2f}%\n".format(cpu_utilizations[algo_name])
-
-    result_label.config(text=result_text)
+    # Create a button to save the result as PDF (only once)
+    if not hasattr(root, 'save_pdf_button'):
+        root.save_pdf_button = tk.Button(root, text="Save as PDF", command=save_as_pdf)
+        root.save_pdf_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
 # GUI setup
 def main():
+    global root
     root = tk.Tk()
     root.title("Plagiarism Checker")
 
