@@ -226,16 +226,24 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
     result_text += f"Processing Time: {processing_time:.2f} seconds\n"
     result_text += f"Similar Count from Algorithm: {similar_count}\n"
 
+    result_text += "\n\n--- Plagiarism Detection Result ---\n\n"
     if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
-        result_text += f"High similarity detected, possible plagiarism found! ({plagiarism_percentage:.2f}% identical)\n\n"
-        result_text += "Identical or very similar content detected."
+        result_text += "Metric\t\t\tPlagiarism Detection\n"
+        result_text += "Plagiarism Percentage\t\t{:.2f}%\n".format(plagiarism_percentage)
+        result_text += "Result\t\t\tHigh similarity detected, possible plagiarism found!\n"
+        result_text += "Description\t\tIdentical or very similar content detected.\n"
         result_label.config(fg="red", text=result_text)
     elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
-        result_text += f"Moderate similarity detected, potential plagiarism found! ({plagiarism_percentage:.2f}% similar)\n\n"
-        result_text += "Possible paraphrasing or close rephrasing of the source material.\n"
+        result_text += "Metric\t\t\tPlagiarism Detection\n"
+        result_text += "Plagiarism Percentage\t\t{:.2f}%\n".format(plagiarism_percentage)
+        result_text += "Result\t\t\tModerate similarity detected, potential plagiarism found!\n"
+        result_text += "Description\t\tPossible paraphrasing or close rephrasing of the source material.\n"
         result_label.config(fg="orange", text=result_text)
     else:
-        result_text += f"Low similarity detected, no strong evidence of plagiarism. ({plagiarism_percentage:.2f}% similar)\n"
+        result_text += "Metric\t\t\tPlagiarism Detection\n"
+        result_text += "Plagiarism Percentage\t\t{:.2f}%\n".format(plagiarism_percentage)
+        result_text += "Result\t\t\tLow similarity detected, no strong evidence of plagiarism.\n"
+        result_text += "Description\t\tNo plagiarism detected.\n"
         result_label.config(fg="green", text=result_text)
 
     # Save result to PDF function
@@ -243,7 +251,66 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, result_text)
+
+        # Create a table for the statistical results
+        pdf.cell(0, 10, "Statistical Results", 1, 1, "C")
+
+        pdf.cell(95, 10, "Metric", 1, 0, "C")
+        pdf.cell(95, 10, "Value", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Jaccard Similarity Score (Word Level)", 1, 0, "C")
+        pdf.cell(95, 10, f"{similarity_word:.2f}", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Jaccard Similarity Score (Lemmatized)", 1, 0, "C")
+        pdf.cell(95, 10, f"{similarity_lemma:.2f}", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Cosine Similarity Score (TF-IDF)", 1, 0, "C")
+        pdf.cell(95, 10, f"{similarity_tfidf[0][0]:.2f}", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Count of Similar Words", 1, 0, "C")
+        pdf.cell(95, 10, f"{similar_word_count}", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Plagiarism Percentage", 1, 0, "C")
+        pdf.cell(95, 10, f"{plagiarism_percentage:.2f}%", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Scheduling Algorithm", 1, 0, "C")
+        pdf.cell(95, 10, f"{algo_name}", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Processing Time", 1, 0, "C")
+        pdf.cell(95, 10, f"{processing_time:.2f} seconds", 1, 0, "C")
+        pdf.ln(10)
+
+        pdf.cell(95, 10, "Similar Count from Algorithm", 1, 0, "C")
+        pdf.cell(95, 10, f"{similar_count}", 1, 0, "C")
+        pdf.ln(20)
+
+        pdf.ln(10)
+        if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
+            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
+            pdf.ln(10)
+            pdf.cell(0, 10, f"High similarity detected, possible plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
+            pdf.ln(10)
+            pdf.cell(0, 10, "Description: Identical or very similar content detected.", 0, 1, "C")
+        elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
+            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
+            pdf.ln(10)
+            pdf.cell(0, 10, f"Moderate similarity detected, potential plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
+            pdf.ln(10)
+            pdf.cell(0, 10, "Description: Possible paraphrasing or close rephrasing of the source material.", 0, 1, "C")
+        else:
+            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
+            pdf.ln(10)
+            pdf.cell(0, 10, f"Low similarity detected, no strong evidence of plagiarism. ({plagiarism_percentage:.2f})%", 0, 1, "C")
+            pdf.ln(10)
+            pdf.cell(0, 10, "Description: No plagiarism detected.", 0, 1, "C")
+    
         pdf.output("plagiarism_report.pdf")
 
     # Create a button to save the result as PDF (only once)
