@@ -335,7 +335,7 @@ def main():
     root.title("Plagiarism Checker")
 
     # Set window size and disable maximizing and full-screen options
-    root.geometry("850x550")  # Set the desired window size
+    root.geometry("850x600")  # Set the desired window size
     
     # Text Entry Boxes
     text_entry1 = tk.Text(root, height=20, width=50)
