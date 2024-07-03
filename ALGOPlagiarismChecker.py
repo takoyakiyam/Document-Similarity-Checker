@@ -329,22 +329,44 @@ def on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var):
 
 # GUI setup
 def main():
+    
     global root
     root = tk.Tk()
     root.title("Plagiarism Checker")
 
+    # Set window size and disable maximizing and full-screen options
+    root.geometry("850x850")  # Set the desired window size
+    root.resizable(False, False)  # Disable window resizing
+    
     # Text Entry Boxes
-    text_entry1 = tk.Text(root, height=10, width=50)
+    text_entry1 = tk.Text(root, height=20, width=50)
     text_entry1.grid(row=0, column=0, padx=10, pady=10)
 
-    open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
-    open_file_button1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
+    word_count_label1 = tk.Label(root, text="Word Count: 0")
+    word_count_label1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
 
-    text_entry2 = tk.Text(root, height=10, width=50)
+    open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
+    open_file_button1.grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
+
+    text_entry2 = tk.Text(root, height=20, width=50)
     text_entry2.grid(row=0, column=1, padx=10, pady=10)
 
+    word_count_label2 = tk.Label(root, text="Word Count: 0")
+    word_count_label2.grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
+
     open_file_button2 = tk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
-    open_file_button2.grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
+    open_file_button2.grid(row=2, column=1, padx=10, pady=5, sticky=tk.W)
+    
+    def update_word_count_labels():
+        text1 = text_entry1.get("1.0", tk.END)[:-1]
+        text2 = text_entry2.get("1.0", tk.END)[:-1]
+        word_count1 = len(text1.split())
+        word_count2 = len(text2.split())
+        word_count_label1.config(text=f"Word Count: {word_count1}")
+        word_count_label2.config(text=f"Word Count: {word_count2}")
+        root.after(100, update_word_count_labels)
+
+    update_word_count_labels()
 
     # Result Label
     result_label = tk.Label(root, text="", justify=tk.LEFT, wraplength=700)
