@@ -214,24 +214,28 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
     # Apply selected algorithm for text processing
     algo_name, processing_time, similar_count = get_scheduling_algorithm(algo, text1, text2, chunk_size)
 
+    # Calculate plagiarism percentage
+    plagiarism_percentage = (similar_word_count / len(set(text1_filtered).union(set(text2_filtered)))) * 100
+
     result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
     result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
     result_text += f"Cosine Similarity Score (TF-IDF): {similarity_tfidf[0][0]:.2f}\n"
     result_text += f"Count of Similar Words: {similar_word_count}\n"
+    result_text += f"Plagiarism Percentage: {plagiarism_percentage:.2f}%\n"
     result_text += f"Scheduling Algorithm: {algo_name}\n"
     result_text += f"Processing Time: {processing_time:.2f} seconds\n"
     result_text += f"Similar Count from Algorithm: {similar_count}\n"
 
-    if similarity_word >= 0.8 and similarity_lemma >= 0.8 and similarity_tfidf[0][0] >= 0.8:  # High Threshold for Plagiarism
-        result_text += "High similarity detected, possible plagiarism found!\n\n"
+    if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
+        result_text += f"High similarity detected, possible plagiarism found! ({plagiarism_percentage:.2f}% identical)\n\n"
         result_text += "Identical or very similar content detected."
         result_label.config(fg="red", text=result_text)
-    elif similarity_word >= 0.5 or similarity_lemma >= 0.5 or similarity_tfidf[0][0] >= 0.5:  # Medium Threshold for Potential Plagiarism
-        result_text += "Moderate similarity detected, potential plagiarism found.\n\n"
+    elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
+        result_text += f"Moderate similarity detected, potential plagiarism found! ({plagiarism_percentage:.2f}% similar)\n\n"
         result_text += "Possible paraphrasing or close rephrasing of the source material.\n"
         result_label.config(fg="orange", text=result_text)
     else:
-        result_text += "Low similarity detected, no strong evidence of plagiarism.\n"
+        result_text += f"Low similarity detected, no strong evidence of plagiarism. ({plagiarism_percentage:.2f}% similar)\n"
         result_label.config(fg="green", text=result_text)
 
     # Save result to PDF function
