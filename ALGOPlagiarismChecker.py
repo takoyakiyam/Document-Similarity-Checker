@@ -345,21 +345,21 @@ def main():
     # Text Entry Boxes
     text_entry1 = tk.Text(root, height=20, width=50)
     text_entry1.grid(row=0, column=0, padx=10, pady=10)
-
+    
     word_count_label1 = tk.Label(root, text="Word Count: 0")
-    word_count_label1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
+    word_count_label1.grid(row=1, column=0, padx=10, pady=5)
 
     open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
-    open_file_button1.grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
+    open_file_button1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
 
     text_entry2 = tk.Text(root, height=20, width=50)
     text_entry2.grid(row=0, column=1, padx=10, pady=10)
 
     word_count_label2 = tk.Label(root, text="Word Count: 0")
-    word_count_label2.grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
+    word_count_label2.grid(row=1, column=1, padx=10, pady=5)
 
     open_file_button2 = tk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
-    open_file_button2.grid(row=2, column=1, padx=10, pady=5, sticky=tk.W)
+    open_file_button2.grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
     
     def update_word_count_labels():
         text1 = text_entry1.get("1.0", tk.END)[:-1]
