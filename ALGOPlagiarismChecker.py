@@ -172,7 +172,6 @@ def get_scheduling_algorithm(algo, text1, text2, chunk_size=25):
     else:
         return "No algorithm selected.", 0, 0
 
-# Define the function to check plagiarism
 def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=None):
     
     if algo == "Round Robin" and chunk_size is None:
@@ -186,13 +185,13 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
     text1_filtered = [word for word in text1.split() if word not in stop_words]
     text2_filtered = [word for word in text2.split() if word not in stop_words]
 
-    # Perform TF-IDF vectorization
+    # Perform TF-IDF vectorization on the entire texts
     vectorizer = TfidfVectorizer()
-    X1 = vectorizer.fit_transform(text1_filtered)
-    X2 = vectorizer.transform(text2_filtered)
+    combined_texts = [' '.join(text1_filtered), ' '.join(text2_filtered)]
+    tfidf_matrix = vectorizer.fit_transform(combined_texts)
 
     # Cosine similarity with TF-IDF vectors
-    similarity_tfidf = cosine_similarity(X1, X2)
+    similarity_tfidf = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
 
     # Parts of Speech Tagging
     text1_pos = nltk.pos_tag(nltk.word_tokenize(text1))
