@@ -173,10 +173,9 @@ def get_scheduling_algorithm(algo, text1, text2, chunk_size=25):
         return "No algorithm selected.", 0, 0
 
 def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=None):
-    
     if algo == "Round Robin" and chunk_size is None:
         chunk_size = 25
-        
+
     text1 = text_entry1.get("1.0", tk.END)[:-1].lower()
     text2 = text_entry2.get("1.0", tk.END)[:-1].lower()
 
@@ -312,22 +311,18 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
 
         # Determine a unique filename
         base_filename = "plagiarism_report"
-        filename = f"{base_filename}.pdf"
+        extension = ".pdf"
         counter = 1
-        while os.path.isfile(filename):
-            filename = f"{base_filename}_{counter}.pdf"
+        filename = base_filename + extension
+        while os.path.exists(filename):
             counter += 1
+            filename = f"{base_filename}_{counter}{extension}"
 
         pdf.output(filename)
+        messagebox.showinfo("PDF Saved", f"Plagiarism report saved as {filename}")
 
-        # Display a message box indicating the PDF has been saved
-        messagebox.showinfo("Save as PDF", "The PDF has been saved successfully!")
-
-    # Create a button to save the result as PDF (only once)
-    if not hasattr(root, 'save_pdf_button'):
-        root.save_pdf_button = tk.Button(root, text="Save as PDF", command=save_as_pdf)
-        root.save_pdf_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
-
+    save_pdf_button = tk.Button(root, text="Save as PDF", command=save_as_pdf)
+    save_pdf_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
 # Show/hide chunk size entry based on selected algorithm
 def on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var):
     if algo_var.get() == "Round Robin":
