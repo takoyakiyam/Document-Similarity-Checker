@@ -246,75 +246,82 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
         result_text += "Description\t\tNo plagiarism detected.\n"
         result_label.config(fg="green", text=result_text)
 
-    # Save result to PDF function
-    def save_as_pdf():
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
+def save_as_pdf():
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
 
-        # Create a table for the statistical results
-        pdf.cell(0, 10, "Statistical Results", 1, 1, "C")
+    # Create a table for the statistical results
+    pdf.cell(0, 10, "Statistical Results", 1, 1, "C")
 
-        pdf.cell(95, 10, "Metric", 1, 0, "C")
-        pdf.cell(95, 10, "Value", 1, 0, "C")
+    pdf.cell(95, 10, "Metric", 1, 0, "C")
+    pdf.cell(95, 10, "Value", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Jaccard Similarity Score (Word Level)", 1, 0, "C")
+    pdf.cell(95, 10, f"{similarity_word:.2f}", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Jaccard Similarity Score (Lemmatized)", 1, 0, "C")
+    pdf.cell(95, 10, f"{similarity_lemma:.2f}", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Cosine Similarity Score (TF-IDF)", 1, 0, "C")
+    pdf.cell(95, 10, f"{similarity_tfidf[0][0]:.2f}", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Count of Similar Words", 1, 0, "C")
+    pdf.cell(95, 10, f"{similar_word_count}", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Plagiarism Percentage", 1, 0, "C")
+    pdf.cell(95, 10, f"{plagiarism_percentage:.2f}%", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Scheduling Algorithm", 1, 0, "C")
+    pdf.cell(95, 10, f"{algo_name}", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Processing Time", 1, 0, "C")
+    pdf.cell(95, 10, f"{processing_time:.2f} seconds", 1, 0, "C")
+    pdf.ln(10)
+
+    pdf.cell(95, 10, "Similar Count from Algorithm", 1, 0, "C")
+    pdf.cell(95, 10, f"{similar_count}", 1, 0, "C")
+    pdf.ln(20)
+
+    pdf.ln(10)
+    if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
+        pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
         pdf.ln(10)
-
-        pdf.cell(95, 10, "Jaccard Similarity Score (Word Level)", 1, 0, "C")
-        pdf.cell(95, 10, f"{similarity_word:.2f}", 1, 0, "C")
+        pdf.cell(0, 10, f"High similarity detected, possible plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
         pdf.ln(10)
-
-        pdf.cell(95, 10, "Jaccard Similarity Score (Lemmatized)", 1, 0, "C")
-        pdf.cell(95, 10, f"{similarity_lemma:.2f}", 1, 0, "C")
+        pdf.cell(0, 10, "Description: Identical or very similar content detected.", 0, 1, "C")
+    elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
+        pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
         pdf.ln(10)
-
-        pdf.cell(95, 10, "Cosine Similarity Score (TF-IDF)", 1, 0, "C")
-        pdf.cell(95, 10, f"{similarity_tfidf[0][0]:.2f}", 1, 0, "C")
+        pdf.cell(0, 10, f"Moderate similarity detected, potential plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
         pdf.ln(10)
-
-        pdf.cell(95, 10, "Count of Similar Words", 1, 0, "C")
-        pdf.cell(95, 10, f"{similar_word_count}", 1, 0, "C")
+        pdf.cell(0, 10, "Description: Possible paraphrasing or close rephrasing of the source material.", 0, 1, "C")
+    else:
+        pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
         pdf.ln(10)
-
-        pdf.cell(95, 10, "Plagiarism Percentage", 1, 0, "C")
-        pdf.cell(95, 10, f"{plagiarism_percentage:.2f}%", 1, 0, "C")
+        pdf.cell(0, 10, f"Low similarity detected, no strong evidence of plagiarism. ({plagiarism_percentage:.2f})%", 0, 1, "C")
         pdf.ln(10)
+        pdf.cell(0, 10, "Description: No plagiarism detected.", 0, 1, "C")
 
-        pdf.cell(95, 10, "Scheduling Algorithm", 1, 0, "C")
-        pdf.cell(95, 10, f"{algo_name}", 1, 0, "C")
-        pdf.ln(10)
+    # Determine a unique filename
+    base_filename = "plagiarism_report"
+    filename = f"{base_filename}.pdf"
+    counter = 1
+    while os.path.isfile(filename):
+        filename = f"{base_filename}_{counter}.pdf"
+        counter += 1
 
-        pdf.cell(95, 10, "Processing Time", 1, 0, "C")
-        pdf.cell(95, 10, f"{processing_time:.2f} seconds", 1, 0, "C")
-        pdf.ln(10)
+    pdf.output(filename)
 
-        pdf.cell(95, 10, "Similar Count from Algorithm", 1, 0, "C")
-        pdf.cell(95, 10, f"{similar_count}", 1, 0, "C")
-        pdf.ln(20)
-
-        pdf.ln(10)
-        if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
-            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
-            pdf.ln(10)
-            pdf.cell(0, 10, f"High similarity detected, possible plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
-            pdf.ln(10)
-            pdf.cell(0, 10, "Description: Identical or very similar content detected.", 0, 1, "C")
-        elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
-            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
-            pdf.ln(10)
-            pdf.cell(0, 10, f"Moderate similarity detected, potential plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
-            pdf.ln(10)
-            pdf.cell(0, 10, "Description: Possible paraphrasing or close rephrasing of the source material.", 0, 1, "C")
-        else:
-            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
-            pdf.ln(10)
-            pdf.cell(0, 10, f"Low similarity detected, no strong evidence of plagiarism. ({plagiarism_percentage:.2f})%", 0, 1, "C")
-            pdf.ln(10)
-            pdf.cell(0, 10, "Description: No plagiarism detected.", 0, 1, "C")
-
-        pdf.output("plagiarism_report.pdf")
-
-         # Display a message box indicating the PDF has been saved
-        messagebox.showinfo("Save as PDF", "The PDF has been saved successfully!")
+    # Display a message box indicating the PDF has been saved
+    messagebox.showinfo("Save as PDF", "The PDF has been saved successfully!")
 
     # Create a button to save the result as PDF (only once)
     if not hasattr(root, 'save_pdf_button'):
