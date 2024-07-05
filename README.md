@@ -1,7 +1,6 @@
-This project is a requirement for CS 006 - Algorithms and Complexity for TIP QC
-CS32S1
-This is a simple plagiarism checker using multiple python libraries
+This project is a requirement for CS 006 - Algorithms and Complexity, which is then re-used and improved for CS 007 - Parallel and Distributed Computing for TIP QC
 
+This is a simple plagiarism checker using multiple python libraries
 This Python program provides a basic plagiarism checker for textual content. It allows you to compare two text inputs (source and suspected copy) and calculates similarity scores using different techniques.
 
 Features:
