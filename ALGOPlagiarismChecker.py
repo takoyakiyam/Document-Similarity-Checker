@@ -125,7 +125,14 @@ def round_robin(text1, text2, chunk_size=25):
     chunks2 = [text2[i:i+chunk_size] for i in range(0, len(text2), chunk_size)]
     similar_count = 0
     for chunk1, chunk2 in zip(chunks1, chunks2):
-        if chunk1 == chunk2:
+        # Calculate TF-IDF vectors for the current chunks
+        vectorizer = TfidfVectorizer()
+        X1 = vectorizer.fit_transform([chunk1])
+        X2 = vectorizer.transform([chunk2])
+        # Calculate cosine similarity between the TF-IDF vectors
+        similarity_tfidf = cosine_similarity(X1, X2)[0][0]
+        # Compare cosine similarity threshold (adjust as needed)
+        if similarity_tfidf > 0.5:
             similar_count += 1
         time.sleep(0.01)  # Simulate processing time for each chunk
     end_time = time.time()
@@ -134,11 +141,18 @@ def round_robin(text1, text2, chunk_size=25):
 
 def shortest_job_next(text1, text2):
     start_time = time.time()
-    # Simulate processing logic by processing the shorter text first
+    # Determine shorter and longer texts
     short_text, long_text = (text1, text2) if len(text1) <= len(text2) else (text2, text1)
     similar_count = 0
     for i in range(len(short_text)):
-        if short_text[i] == long_text[i]:
+        # Calculate TF-IDF vectors for the current characters
+        vectorizer = TfidfVectorizer()
+        X1 = vectorizer.fit_transform([short_text[i]])
+        X2 = vectorizer.transform([long_text[i]])
+        # Calculate cosine similarity between the TF-IDF vectors
+        similarity_tfidf = cosine_similarity(X1, X2)[0][0]
+        # Compare cosine similarity threshold (adjust as needed)
+        if similarity_tfidf > 0.5:
             similar_count += 1
         time.sleep(0.01)  # Simulate processing time for each character
     for i in range(len(short_text), len(long_text)):
@@ -149,12 +163,19 @@ def shortest_job_next(text1, text2):
 
 def priority_scheduling(text1, text2):
     start_time = time.time()
-    # Simulate processing logic by prioritizing word-level similarity
+    # Split texts into words
     words1 = text1.split()
     words2 = text2.split()
     similar_count = 0
     for word1, word2 in zip(words1, words2):
-        if word1 == word2:
+        # Calculate TF-IDF vectors for the current words
+        vectorizer = TfidfVectorizer()
+        X1 = vectorizer.fit_transform([word1])
+        X2 = vectorizer.transform([word2])
+        # Calculate cosine similarity between the TF-IDF vectors
+        similarity_tfidf = cosine_similarity(X1, X2)[0][0]
+        # Compare cosine similarity threshold (adjust as needed)
+        if similarity_tfidf > 0.5:
             similar_count += 1
         time.sleep(0.01)  # Simulate processing time for each word
     end_time = time.time()
