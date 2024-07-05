@@ -28,6 +28,7 @@ Disclaimer:
 This is a basic plagiarism checker for educational purposes. It might not capture all plagiarism techniques and for critical tasks, consider using more advanced plagiarism detection tools.
 
 for program demonstration, run:
-pip install nltk tkinter PyPDF2 docx markdown striprtf beautifulsoup4 csv json xml.etree sklearn numpy matplotlib
+pip install nltk time tkinter fpdf PyPDF2 python-docx markdown striprtf beautifulsoup4 csv json xml yaml scikit-learn
+
 
 
