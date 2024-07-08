@@ -321,7 +321,7 @@ def check_similarity(text_entry1, text_entry2, result_label, algo, chunk_size=No
         pdf.output(filename)
         messagebox.showinfo("PDF Saved", f"Plagiarism report saved as {filename}")
 
-    save_pdf_button = tk.Button(root, text="Save as PDF", command=save_as_pdf)
+    save_pdf_button = ttk.Button(root, text="Save as PDF", command=save_as_pdf)
     save_pdf_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
 # Show/hide chunk size entry based on selected algorithm
 def on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var):
@@ -354,7 +354,7 @@ def main():
     style.configure("TButton", font=("Helvetica", 10))
     style.configure("TCombobox", font=("Helvetica", 10))
 
-    text_entry1 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
+    text_entry1 = tk.Text(root, height=30, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
     text_entry1.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
     open_file_button1 = ttk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
@@ -363,7 +363,7 @@ def main():
     word_count_label1 = ttk.Label(root, text="Word Count: 0")
     word_count_label1.grid(row=1, column=0, padx=10, pady=5, sticky="e")
 
-    text_entry2 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
+    text_entry2 = tk.Text(root, height=30, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
     text_entry2.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
     open_file_button2 = ttk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
