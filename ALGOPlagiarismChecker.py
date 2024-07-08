@@ -231,19 +231,19 @@ def check_similarity(text_entry1, text_entry2, result_label, algo, chunk_size=No
         result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
         result_text += "Result\t\t\tHigh similarity detected!\n"
         result_text += "Description\t\tIdentical or very similar content detected.\n"
-        result_label.config(fg="red", text=result_text)
+        result_label.config(foreground="red", text=result_text)
     elif similarity_percentage >= 50:  # Medium Threshold for Similarity
         result_text += "Metric\t\t\tSimilarity Detection\n"
         result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
         result_text += "Result\t\t\tModerate similarity detected!\n"
         result_text += "Description\t\tPossible paraphrasing or close rephrasing of the source material.\n"
-        result_label.config(fg="orange", text=result_text)
+        result_label.config(foreground="orange", text=result_text)
     else:
         result_text += "Metric\t\t\tSimilarity Detection\n"
         result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
         result_text += "Result\t\t\tLow similarity detected.\n"
         result_text += "Description\t\tNo strong evidence of similarity.\n"
-        result_label.config(fg="green", text=result_text)
+        result_label.config(foreground="green", text=result_text)
 
     def save_as_pdf():
         pdf = FPDF()
@@ -334,33 +334,44 @@ def on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var):
 
 # GUI setup
 def main():
-    
     global root
     root = tk.Tk()
     root.title("Document Similarity Checker")
 
     # Set window size and disable maximizing and full-screen options
     root.geometry("850x850")  # Set the desired window size
-    
+
+    # Make the rows and columns resizable
+    for i in range(6):
+        root.grid_rowconfigure(i, weight=1)
+    for i in range(2):
+        root.grid_columnconfigure(i, weight=1)
+
     # Text Entry Boxes
-    text_entry1 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black")
-    text_entry1.grid(row=0, column=0, padx=10, pady=10)
-    
-    word_count_label1 = tk.Label(root, text="Word Count: 0")
-    word_count_label1.grid(row=1, column=0, padx=10, pady=5)
+    style = ttk.Style()
+    style.configure("TText", borderwidth=1, relief="solid", font=("Helvetica", 10))
+    style.configure("TLabel", font=("Helvetica", 12))
+    style.configure("TButton", font=("Helvetica", 10))
+    style.configure("TCombobox", font=("Helvetica", 10))
 
-    open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
-    open_file_button1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
+    text_entry1 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
+    text_entry1.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-    text_entry2 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black")
-    text_entry2.grid(row=0, column=1, padx=10, pady=10)
+    open_file_button1 = ttk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
+    open_file_button1.grid(row=1, column=0, padx=10, pady=5, sticky="w")
 
-    word_count_label2 = tk.Label(root, text="Word Count: 0")
-    word_count_label2.grid(row=1, column=1, padx=10, pady=5)
+    word_count_label1 = ttk.Label(root, text="Word Count: 0")
+    word_count_label1.grid(row=1, column=0, padx=10, pady=5, sticky="e")
 
-    open_file_button2 = tk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
-    open_file_button2.grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
-    
+    text_entry2 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
+    text_entry2.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+
+    open_file_button2 = ttk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
+    open_file_button2.grid(row=1, column=1, padx=10, pady=5, sticky="w")
+
+    word_count_label2 = ttk.Label(root, text="Word Count: 0")
+    word_count_label2.grid(row=1, column=1, padx=10, pady=5, sticky="e")
+
     def update_word_count_labels():
         text1 = text_entry1.get("1.0", tk.END)[:-1]
         text2 = text_entry2.get("1.0", tk.END)[:-1]
@@ -373,36 +384,36 @@ def main():
     update_word_count_labels()
 
     # Result Label
-    result_label = tk.Label(root, text="", justify=tk.LEFT, wraplength=700)
-    result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+    result_label = ttk.Label(root, text="", justify=tk.LEFT, wraplength=700)
+    result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
     # Algorithm Selection Dropdown
-    algo_label = tk.Label(root, text="Select Scheduling Algorithm:")
-    algo_label.grid(row=3, column=0, padx=10, pady=5, sticky=tk.E)
+    algo_label = ttk.Label(root, text="Select Scheduling Algorithm:")
+    algo_label.grid(row=3, column=0, padx=10, pady=5, sticky="e")
 
     algorithms = ["Round Robin", "Shortest Job Next", "Priority Scheduling"]
     algo_var = tk.StringVar(root)
     algo_var.set(algorithms[2])  # Default selection
 
     algo_dropdown = ttk.Combobox(root, textvariable=algo_var, values=algorithms, state="readonly")
-    algo_dropdown.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
+    algo_dropdown.grid(row=3, column=1, padx=10, pady=5, sticky="w")
 
     # Chunk Size for Round Robin
-    chunk_size_label = tk.Label(root, text="Chunk Size:")
-    chunk_size_entry = tk.Entry(root)
+    chunk_size_label = ttk.Label(root, text="Chunk Size:")
+    chunk_size_entry = ttk.Entry(root)
     chunk_size_entry.insert(0, "25")
 
     # Show/hide chunk size entry based on selected algorithm
     algo_dropdown.bind("<<ComboboxSelected>>", lambda event: on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var))
 
     # Button to check similarity
-    check_button = tk.Button(root, text="Check Similarity", 
-                         command=lambda: check_similarity(
-                             text_entry1, 
-                             text_entry2, 
-                             result_label, 
-                             algo_var.get(), 
-                             int(chunk_size_entry.get()) if algo_var.get() == "Round Robin" else None))
+    check_button = ttk.Button(root, text="Check Similarity", 
+                            command=lambda: check_similarity(
+                                text_entry1, 
+                                text_entry2, 
+                                result_label, 
+                                algo_var.get(), 
+                                int(chunk_size_entry.get()) if algo_var.get() == "Round Robin" else None))
     check_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
     root.mainloop()
