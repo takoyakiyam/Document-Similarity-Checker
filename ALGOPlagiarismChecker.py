@@ -172,7 +172,7 @@ def get_scheduling_algorithm(algo, text1, text2, chunk_size=25):
     else:
         return "No algorithm selected.", 0, 0
 
-def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=None):
+def check_similarity(text_entry1, text_entry2, result_label, algo, chunk_size=None):
     if algo == "Round Robin" and chunk_size is None:
         chunk_size = 25
 
@@ -214,35 +214,35 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
     algo_name, processing_time, similar_count = get_scheduling_algorithm(algo, text1, text2, chunk_size)
 
     # Calculate plagiarism percentage
-    plagiarism_percentage = (similar_word_count / len(set(text1_filtered).union(set(text2_filtered)))) * 100
+    similarity_percentage = (similar_word_count / len(set(text1_filtered).union(set(text2_filtered)))) * 100
 
-    result_text = f"Jaccard Similarity Score (Word Level): {similarity_word:.2f}\n"
-    result_text += f"Jaccard Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
+    result_text = f"Similarity Score (Word Level): {similarity_word:.2f}\n"
+    result_text += f"Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
     result_text += f"Cosine Similarity Score (TF-IDF): {similarity_tfidf[0][0]:.2f}\n"
     result_text += f"Count of Similar Words: {similar_word_count}\n"
-    result_text += f"Plagiarism Percentage: {plagiarism_percentage:.2f}%\n"
+    result_text += f"Similarity Percentage: {similarity_percentage:.2f}%\n"
     result_text += f"Scheduling Algorithm: {algo_name}\n"
     result_text += f"Processing Time: {processing_time:.2f} seconds\n"
     result_text += f"Similar Count from Algorithm: {similar_count}\n"
 
-    result_text += "\n\n--- Plagiarism Detection Result ---\n\n"
-    if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
-        result_text += "Metric\t\t\tPlagiarism Detection\n"
-        result_text += "Plagiarism Percentage\t\t{:.2f}%\n".format(plagiarism_percentage)
-        result_text += "Result\t\t\tHigh similarity detected, possible plagiarism found!\n"
+    result_text += "\n\n--- Similarity Detection Result ---\n\n"
+    if similarity_percentage >= 80:  # High Threshold for Similarity
+        result_text += "Metric\t\t\tSimilarity Detection\n"
+        result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
+        result_text += "Result\t\t\tHigh similarity detected!\n"
         result_text += "Description\t\tIdentical or very similar content detected.\n"
         result_label.config(fg="red", text=result_text)
-    elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
-        result_text += "Metric\t\t\tPlagiarism Detection\n"
-        result_text += "Plagiarism Percentage\t\t{:.2f}%\n".format(plagiarism_percentage)
-        result_text += "Result\t\t\tModerate similarity detected, potential plagiarism found!\n"
+    elif similarity_percentage >= 50:  # Medium Threshold for Similarity
+        result_text += "Metric\t\t\tSimilarity Detection\n"
+        result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
+        result_text += "Result\t\t\tModerate similarity detected!\n"
         result_text += "Description\t\tPossible paraphrasing or close rephrasing of the source material.\n"
         result_label.config(fg="orange", text=result_text)
     else:
-        result_text += "Metric\t\t\tPlagiarism Detection\n"
-        result_text += "Plagiarism Percentage\t\t{:.2f}%\n".format(plagiarism_percentage)
-        result_text += "Result\t\t\tLow similarity detected, no strong evidence of plagiarism.\n"
-        result_text += "Description\t\tNo plagiarism detected.\n"
+        result_text += "Metric\t\t\tSimilarity Detection\n"
+        result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
+        result_text += "Result\t\t\tLow similarity detected.\n"
+        result_text += "Description\t\tNo strong evidence of similarity.\n"
         result_label.config(fg="green", text=result_text)
 
     def save_as_pdf():
@@ -273,8 +273,8 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
         pdf.cell(95, 10, f"{similar_word_count}", 1, 0, "C")
         pdf.ln(10)
 
-        pdf.cell(95, 10, "Plagiarism Percentage", 1, 0, "C")
-        pdf.cell(95, 10, f"{plagiarism_percentage:.2f}%", 1, 0, "C")
+        pdf.cell(95, 10, "Similarity Percentage", 1, 0, "C")
+        pdf.cell(95, 10, f"{similarity_percentage:.2f}%", 1, 0, "C")
         pdf.ln(10)
 
         pdf.cell(95, 10, "Scheduling Algorithm", 1, 0, "C")
@@ -290,22 +290,22 @@ def check_plagiarism(text_entry1, text_entry2, result_label, algo, chunk_size=No
         pdf.ln(20)
 
         pdf.ln(10)
-        if plagiarism_percentage >= 80:  # High Threshold for Plagiarism
+        if similarity_percentage >= 80:  # High Threshold for Plagiarism
             pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, f"High similarity detected, possible plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
+            pdf.cell(0, 10, f"High similarity detected, possible plagiarism found! ({similarity_percentage:.2f})%", 0, 1, "C")
             pdf.ln(10)
             pdf.cell(0, 10, "Description: Identical or very similar content detected.", 0, 1, "C")
-        elif plagiarism_percentage >= 50:  # Medium Threshold for Potential Plagiarism
+        elif similarity_percentage >= 50:  # Medium Threshold for Potential Plagiarism
             pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, f"Moderate similarity detected, potential plagiarism found! ({plagiarism_percentage:.2f})%", 0, 1, "C")
+            pdf.cell(0, 10, f"Moderate similarity detected, potential plagiarism found! ({similarity_percentage:.2f})%", 0, 1, "C")
             pdf.ln(10)
             pdf.cell(0, 10, "Description: Possible paraphrasing or close rephrasing of the source material.", 0, 1, "C")
         else:
             pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, f"Low similarity detected, no strong evidence of plagiarism. ({plagiarism_percentage:.2f})%", 0, 1, "C")
+            pdf.cell(0, 10, f"Low similarity detected, no strong evidence of plagiarism. ({similarity_percentage:.2f})%", 0, 1, "C")
             pdf.ln(10)
             pdf.cell(0, 10, "Description: No plagiarism detected.", 0, 1, "C")
 
@@ -337,13 +337,13 @@ def main():
     
     global root
     root = tk.Tk()
-    root.title("Plagiarism Checker")
+    root.title("Document Similarity Checker")
 
     # Set window size and disable maximizing and full-screen options
     root.geometry("850x850")  # Set the desired window size
     
     # Text Entry Boxes
-    text_entry1 = tk.Text(root, height=20, width=50)
+    text_entry1 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black")
     text_entry1.grid(row=0, column=0, padx=10, pady=10)
     
     word_count_label1 = tk.Label(root, text="Word Count: 0")
@@ -352,7 +352,7 @@ def main():
     open_file_button1 = tk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
     open_file_button1.grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
 
-    text_entry2 = tk.Text(root, height=20, width=50)
+    text_entry2 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black")
     text_entry2.grid(row=0, column=1, padx=10, pady=10)
 
     word_count_label2 = tk.Label(root, text="Word Count: 0")
@@ -395,9 +395,9 @@ def main():
     # Show/hide chunk size entry based on selected algorithm
     algo_dropdown.bind("<<ComboboxSelected>>", lambda event: on_algorithm_change(event, chunk_size_label, chunk_size_entry, algo_var))
 
-    # Button to check plagiarism
-    check_button = tk.Button(root, text="Check Plagiarism", 
-                         command=lambda: check_plagiarism(
+    # Button to check similarity
+    check_button = tk.Button(root, text="Check Similarity", 
+                         command=lambda: check_similarity(
                              text_entry1, 
                              text_entry2, 
                              result_label, 
