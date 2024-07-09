@@ -213,36 +213,36 @@ def check_similarity(text_entry1, text_entry2, result_label, algo, chunk_size=No
     # Apply selected algorithm for text processing
     algo_name, processing_time, similar_count = get_scheduling_algorithm(algo, text1, text2, chunk_size)
 
-    # Calculate plagiarism percentage
+    # Calculate similarity percentage
     similarity_percentage = (similar_word_count / len(set(text1_filtered).union(set(text2_filtered)))) * 100
 
-    result_text = f"Similarity Score (Word Level): {similarity_word:.2f}\n"
-    result_text += f"Similarity Score (Lemmatized): {similarity_lemma:.2f}\n"
-    result_text += f"Cosine Similarity Score (TF-IDF): {similarity_tfidf[0][0]:.2f}\n"
-    result_text += f"Count of Similar Words: {similar_word_count}\n"
-    result_text += f"Similarity Percentage: {similarity_percentage:.2f}%\n"
-    result_text += f"Scheduling Algorithm: {algo_name}\n"
-    result_text += f"Processing Time: {processing_time:.2f} seconds\n"
-    result_text += f"Similar Count from Algorithm: {similar_count}\n"
+    result_text = f"Similarity Score (Word Level):       {similarity_word:.2f}\n"
+    result_text += f"Similarity Score (Lemmatized):      {similarity_lemma:.2f}\n"
+    result_text += f"Cosine Similarity Score (TF-IDF):   {similarity_tfidf[0][0]:.2f}\n"
+    result_text += f"Count of Similar Words:             {similar_word_count}\n"
+    result_text += f"Similarity Percentage:              {similarity_percentage:.2f}%\n"
+    result_text += f"Scheduling Algorithm:               {algo_name}\n"
+    result_text += f"Processing Time:                    {processing_time:.2f} seconds\n"
+    result_text += f"Similar Count from Algorithm:       {similar_count}\n"
 
-    result_text += "\n\n--- Similarity Detection Result ---\n\n"
+    result_text += "\n\n------------------ Similarity Detection Result ------------------\n\n"
     if similarity_percentage >= 80:  # High Threshold for Similarity
-        result_text += "Metric\t\t\tSimilarity Detection\n"
-        result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
-        result_text += "Result\t\t\tHigh similarity detected!\n"
-        result_text += "Description\t\tIdentical or very similar content detected.\n"
+        result_text += "Metric:                   Similarity Detection\n"
+        result_text += "Similarity Percentage:    {:.2f}%\n".format(similarity_percentage)
+        result_text += "Result:                   High similarity detected!\n"
+        result_text += "Description:              Identical or very similar content detected.\n"
         result_label.config(foreground="red", text=result_text)
     elif similarity_percentage >= 50:  # Medium Threshold for Similarity
-        result_text += "Metric\t\t\tSimilarity Detection\n"
-        result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
-        result_text += "Result\t\t\tModerate similarity detected!\n"
-        result_text += "Description\t\tPossible paraphrasing or close rephrasing of the source material.\n"
+        result_text += "Metric:                   Similarity Detection\n"
+        result_text += "Similarity Percentage:    {:.2f}%\n".format(similarity_percentage)
+        result_text += "Result:                   Moderate similarity detected!\n"
+        result_text += "Description:              Possible paraphrasing or close rephrasing of the source material.\n"
         result_label.config(foreground="orange", text=result_text)
     else:
-        result_text += "Metric\t\t\tSimilarity Detection\n"
-        result_text += "Similarity Percentage\t\t{:.2f}%\n".format(similarity_percentage)
-        result_text += "Result\t\t\tLow similarity detected.\n"
-        result_text += "Description\t\tNo strong evidence of similarity.\n"
+        result_text += "Metric:                   Similarity Detection\n"
+        result_text += "Similarity Percentage:    {:.2f}%\n".format(similarity_percentage)
+        result_text += "Result:                   Low similarity detected.\n"
+        result_text += "Description:              No strong evidence of similarity.\n"
         result_label.config(foreground="green", text=result_text)
 
     def save_as_pdf():
@@ -290,27 +290,27 @@ def check_similarity(text_entry1, text_entry2, result_label, algo, chunk_size=No
         pdf.ln(20)
 
         pdf.ln(10)
-        if similarity_percentage >= 80:  # High Threshold for Plagiarism
-            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
+        if similarity_percentage >= 80:  # High Threshold for Similarity
+            pdf.cell(0, 10, "--------- Similarity Detection Result ---------", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, f"High similarity detected, possible plagiarism found! ({similarity_percentage:.2f})%", 0, 1, "C")
+            pdf.cell(0, 10, f"High similarity detected, possible copying found! ({similarity_percentage:.2f})%", 0, 1, "C")
             pdf.ln(10)
             pdf.cell(0, 10, "Description: Identical or very similar content detected.", 0, 1, "C")
-        elif similarity_percentage >= 50:  # Medium Threshold for Potential Plagiarism
-            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
+        elif similarity_percentage >= 50:  # Medium Threshold for Potential Similarity
+            pdf.cell(0, 10, "--------- Similarity Detection Result ---------", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, f"Moderate similarity detected, potential plagiarism found! ({similarity_percentage:.2f})%", 0, 1, "C")
+            pdf.cell(0, 10, f"Moderate similarity detected, potential copying found! ({similarity_percentage:.2f})%", 0, 1, "C")
             pdf.ln(10)
             pdf.cell(0, 10, "Description: Possible paraphrasing or close rephrasing of the source material.", 0, 1, "C")
         else:
-            pdf.cell(0, 10, "--- Plagiarism Detection Result ---", 0, 1, "C")
+            pdf.cell(0, 10, "--------- Similarity Detection Result ---------", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, f"Low similarity detected, no strong evidence of plagiarism. ({similarity_percentage:.2f})%", 0, 1, "C")
+            pdf.cell(0, 10, f"Low similarity detected, no strong evidence of copying. ({similarity_percentage:.2f})%", 0, 1, "C")
             pdf.ln(10)
-            pdf.cell(0, 10, "Description: No plagiarism detected.", 0, 1, "C")
+            pdf.cell(0, 10, "Description: No similarity detected.", 0, 1, "C")
 
         # Determine a unique filename
-        base_filename = "plagiarism_report"
+        base_filename = "similarity_report"
         extension = ".pdf"
         counter = 1
         filename = base_filename + extension
@@ -319,7 +319,7 @@ def check_similarity(text_entry1, text_entry2, result_label, algo, chunk_size=No
             filename = f"{base_filename}_{counter}{extension}"
 
         pdf.output(filename)
-        messagebox.showinfo("PDF Saved", f"Plagiarism report saved as {filename}")
+        messagebox.showinfo("PDF Saved", f"Similarity report saved as {filename}")
 
     save_pdf_button = ttk.Button(root, text="Save as PDF", command=save_as_pdf)
     save_pdf_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
@@ -354,7 +354,7 @@ def main():
     style.configure("TButton", font=("Helvetica", 10))
     style.configure("TCombobox", font=("Helvetica", 10))
 
-    text_entry1 = tk.Text(root, height=30, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
+    text_entry1 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
     text_entry1.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
     open_file_button1 = ttk.Button(root, text="Open File 1", command=lambda: open_file(text_entry1))
@@ -363,7 +363,7 @@ def main():
     word_count_label1 = ttk.Label(root, text="Word Count: 0")
     word_count_label1.grid(row=1, column=0, padx=10, pady=5, sticky="e")
 
-    text_entry2 = tk.Text(root, height=30, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
+    text_entry2 = tk.Text(root, height=20, width=50, highlightthickness=1, highlightbackground="black", font=("Helvetica", 10))
     text_entry2.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
     open_file_button2 = ttk.Button(root, text="Open File 2", command=lambda: open_file(text_entry2))
@@ -384,7 +384,7 @@ def main():
     update_word_count_labels()
 
     # Result Label
-    result_label = ttk.Label(root, text="", justify=tk.LEFT, wraplength=700)
+    result_label = ttk.Label(root, text="", justify=tk.CENTER, wraplength=700, anchor="center")
     result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
     # Algorithm Selection Dropdown
